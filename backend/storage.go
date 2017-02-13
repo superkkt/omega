@@ -44,30 +44,30 @@ type FolderManager interface {
 	// nil if there is no folder.
 	GetFolders(lock database.LockMode) (folders []Folder, err error)
 
-	// GetFolderByID returns a folders that belong to a user identified by
-	// the credential and its unique ID is id. It is necessary to acquire
+	// GetFolderByID returns a folder that belong to a user identified by
+	// the credential and its unique folder ID. It is necessary to acquire
 	// a read or write lock depending on the lock mode for the fetched folder
 	// to prevent any concurrent updates from another transaction.
 	GetFolderByID(folderID uint64, lock database.LockMode) (folder Folder, err error)
 
-	// GetFolderByPath returns a folders that belong to a user identified by
-	// the credential and its path. An element of path slice means a node on
+	// GetFolderByPath returns a folder that belong to a user identified by
+	// the credential and its path. An element of the path slice means a node on
 	// the path. For example, "/a/b/c" should be represented as []string{"a",
 	// "b", "c"}. It is necessary to acquire a read or write lock depending
 	// on the lock mode for the fetched folder to prevent any concurrent
 	// updates from another transaction.
 	GetFolderByPath(path []string, lock database.LockMode) (folder Folder, err error)
 
-	// GetFolderByType returns folders that have type in their folder type.
-	// It is necessary to acquire a read or write lock depending on the lock
+	// GetFolderByType returns folders whose type is same with t. It is 
+	// necessary to acquire a read or write lock depending on the lock
 	// mode for the fetched folders to prevent any concurrent updates from
 	// another transaction. GetFolderByType can return nil if there is no
 	// folder that has been matched.
 	GetFolderByType(t FolderType, lock database.LockMode) ([]Folder, error)
 
-	// AddFolder adds a new folder under the folder whose ID is parentID.
-	// AddFolder should append a new folder history after it succeeds in
-	// adding the new folder.
+	// AddFolder adds a new folder under the parent folder whose ID is 
+	// parentID. AddFolder should append a new folder history after it 
+	// succeeds in adding the new folder.
 	AddFolder(parentID uint64, name string, t FolderType) (folderID uint64, err error)
 
 	// DeleteFolder removes a folder whose ID is folderID. DeleteFolder
@@ -75,22 +75,23 @@ type FolderManager interface {
 	// the new folder.
 	DeleteFolder(folderID uint64) error
 
-	// MoveFolder moves a folder, whose ID is folderID, under the folder
-	// whose ID is newParentID. MoveFolder should append a new folder
+	// MoveFolder moves a folder, whose ID is folderID, under the target 
+	// folder whose ID is newParentID. MoveFolder should append a new folder
 	// history after it succeeds in moving the new folder.
 	UpdateFolder(folderID, newParentID uint64, newName string) error
 
 	// GetLastFolderHistory returns the last history related with folderID.
 	GetLastFolderHistory(folderID uint64, lock database.LockMode) (FolderHistory, error)
 
-	// GetFolderHistories returns folder change histories taht belong to
-	// a user identified by the credential. It is necessary to acquire a read
+	// GetFolderHistories returns folder change histories that belong to a 
+	// user identified by the credential. It is necessary to acquire a read
 	// or write lock depending on the lock mode for the fetched histories to
 	// prevent any concurrent updates from another transaction. offset is a
-	// folder history ID as a starting position. desc means descending order
-	// if it is true, otherwise ascending order. Zero offset means the last
-	// item if desc is true. Zero limit means infinite. GetFolderHistories
-	// can return nil if there is no change history.
+	// folder history ID as a starting position of this query. desc means 
+	// descending order of sort if it is true, otherwise ascending order. 
+	// Zero offset means the last history if desc is true. Zero limit means 
+	// no limit, which is infinite. GetFolderHistories can return nil if there 
+	// is no change history.
 	GetFolderHistories(offset, limit uint64, desc bool, lock database.LockMode) ([]FolderHistory, error)
 
 	// DeleteFolderHistory removes a folder history whose ID is historyID.
@@ -98,9 +99,9 @@ type FolderManager interface {
 }
 
 type Folder struct {
-	ID       uint64
-	Name     string
-	ParentID uint64
+	ID       uint64 // Unique Identifier.
+	Name     string 
+	ParentID uint64 // Parent's Unique Identifier.
 	Type     FolderType
 }
 
@@ -114,12 +115,12 @@ const (
 	// Normal email folder
 	EmailFolder
 	// Emails waiting to be sent out will be placed in the OUTBOX, and after
-	// its sent out, it would be in the SENT ITEMS folder.
+	// its sent out, it would be in the SENT folder.
 	EmailOutbox
 )
 
 type FolderHistory interface {
-	ID() uint64 // History ID
+	ID() uint64 // History ID (NOT folder's ID).
 	Operation() FolderOperation
 	Value() (Folder, error)
 	Timestamp() time.Time
@@ -135,15 +136,18 @@ const (
 
 type EmailManager interface {
 	Credential() Credential
+	
+	// FolderID returns current folder's ID selected by this email manager.
 	FolderID() uint64
 
 	// GetEmails returns emails that belong to the folder identified by the
 	// folderID. It is necessary to acquire a read or write lock depending on
 	// the lock mode for the fetched emails to prevent any concurrent updates
-	// from another transaction. offset is an email ID as a starting position.
-	// desc means descending order if it is true, otherwise ascending order.
-	// Zero offset means the last item if desc is true. Zero limit means
-	// infinite. GetEmails can return nil if there is no email we find.
+	// from another transaction. offset is an email ID as a starting position 
+	// of this query. desc means descending order of sort if it is true, 
+	// otherwise ascending order. Zero offset means the last email if desc is 
+	// true. Zero limit means no limit, which is infinite. GetEmails can return 
+	// nil if there is no email we find.
 	GetEmails(offset, limit uint64, desc bool, lock database.LockMode) (emails []*Email, err error)
 
 	// GetEmail returns an email whose ID is emailID. It is necessary to
@@ -157,9 +161,10 @@ type EmailManager interface {
 	// fetched email to prevent any concurrent updates from another transaction.
 	GetRawEmail(emailID uint64, lock database.LockMode) ([]byte, error)
 
+	// GetAttachment returns an attachment whose ID is attID.
 	GetAttachment(attID uint64) (Attachment, error)
 
-	// AddEmail adds a new email and should append a new email history
+	// AddEmail adds a new email and should also append a new email history
 	// after it succeeds in adding the new mail.
 	AddEmail(rawEmail []byte) (*Email, error)
 
@@ -173,37 +178,39 @@ type EmailManager interface {
 	// the email.
 	DeleteEmail(emailID uint64) error
 
-	// MoveEmail moves an email, whose ID is emailID, under the folder whose
-	// ID is newFolderID. MoveEmail should append a new email history after
+	// MoveEmail moves an email, whose ID is emailID, under the target folder 
+	// whose ID is newFolderID. MoveEmail should append a new email history after
 	// it succeeds in moving the email. This is a helper function to serialize
-	// delete and add functions.
+	// delete and subsequent add operations.
 	MoveEmail(emailID, newFolderID uint64) (newEmailID uint64, err error)
 
 	// GetNumEmailHistories returns the number of email histories whose email's
-	// timestamp is within range from current time. offset is an history ID as
-	// a starting position. desc means descending order if it is true, otherwise
-	// ascending order.
+	// timestamp is within range from current time to (current time - duration). 
+	// offset is an history ID as a starting position of this query. desc means 
+	// descending order of sort if it is true, otherwise ascending order.
 	GetNumEmailHistories(offset uint64, duration time.Duration, desc bool) (uint64, error)
 
-	// GetLastEmailHistory returns the last history related with emailID.
+	// GetLastEmailHistory returns the last history related with emailID. It is 
+	// necessary to acquire a read or write lock depending on the lock mode for 
+	// the fetched history to prevent any concurrent updates from another transaction.
 	GetLastEmailHistory(emailID uint64, lock database.LockMode) (EmailHistory, error)
 
 	// GetEmailHistories returns email change histories that belong to the folder
-	// identified by the folderID in the EmailManager. It is necessary to acquire
+	// identified by the folder ID of this email manager. It is necessary to acquire
 	// a read or write lock depending on the lock mode for the fetched histories
 	// to prevent any concurrent updates from another transaction. offset is a
-	// history ID as a starting position. desc means descending order if it is
-	// true, otherwise ascending order. Zero offset means the last item if desc
-	// is true. Zero limit means infinite. GetEmailHistories can return nil if
-	// there is no change history.
+	// history ID as a starting position of this query. desc means descending order
+	// of sort if it is true, otherwise ascending order. Zero offset means the last 
+	// history if desc is true. Zero limit means no limit, which is infinite. 
+	// GetEmailHistories can return nil if there is no change history.
 	GetEmailHistories(offset, limit uint64, desc bool, lock database.LockMode) ([]EmailHistory, error)
 
-	// DeleteEmailHistory removes a email change history whose ID is historyID.
+	// DeleteEmailHistory removes an email change history whose ID is historyID.
 	DeleteEmailHistory(historyID uint64) error
 }
 
 type Email struct {
-	ID          uint64
+	ID          uint64 // Unique Identifier.
 	From        EmailAddress
 	To          []EmailAddress
 	ReplyTo     []EmailAddress
@@ -213,16 +220,16 @@ type Email struct {
 	Body        string
 	Charset     string // Content character set of the root MIME part, which can be empty string.
 	Attachments []Attachment
-	Seen        bool
+	Seen        bool // Already read?
 }
 
 type EmailAddress struct {
-	Name    string
-	Address string
+	Name    string // i.e., Muzi Katoshi
+	Address string // i.e., muzikatoshi@gmail.com
 }
 
 type Attachment interface {
-	ID() uint64
+	ID() uint64 // Unique Identifier.
 	Name() string
 	// ContentType returns MIME Content-Type.
 	ContentType() string
