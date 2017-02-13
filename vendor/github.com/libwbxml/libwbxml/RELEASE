@@ -1,0 +1,64 @@
+Making a release
+================
+
+To make a release of libwbxml, do the following:
+
+ - check out a fresh copy from github
+
+ - increment the version numbers in ./CMakeLists.txt: 
+
+   Package Version:
+   LIBWBXML_VERSION_MAJOR
+   LIBWBXML_VERSION_MINOR
+   LIBWBXML_VERSION_PATCH
+
+   Library Version:
+   LIBWBXML_LIBVERSION_AGE 
+    * Increment if any interface changed since last release.
+
+   LIBWBXML_LIBVERSION_REVISION
+    * Increment if any library code changed since last release.
+      Set to 0 if any interface  has been changed since last release.
+
+   LIBWBXML_LIBVERSION_AGE
+    * Reset to 0 if any interface has been removed since last release.
+      If any interface has been added then increment.
+
+
+ - Run "make test" again several times to try to see race conditions.
+   "cd trunk"
+   "cmake . -B/tmp/build/libwbxml"
+   "cd /tmp/build/libwbxml"
+   "make"
+   "make test"
+
+ - Commit and push the increased version changes (and build fixes)
+
+ - if someone else made changes and the push fails,
+   you have to "git pull" and run the tests again
+
+ - please run "git status" before you continue to be 100 percent sure
+   that there is no forgotten commit and no unrevisioned file.
+
+ - Check ChangeLog to be complete and add the new release name.
+
+ - Once the commit succeeds, you have to create a new release on GitHub.
+   Please use the web GUI of Github and write some useful release notes. 
+
+ - create tarballs for an out-of-source-build with
+   "cmake . -B/tmp/build/libwbxml-$MAJOR.$MINOR.$PATCH",
+   "cd /tmp/build/libwbxml-$MAJOR.$MINOR.$PATCH",
+   "make package_source"
+
+ - write checksums with md5sum from the tarballs to a file with the
+   same name like the tarballs without the tar and compression suffixes
+   and plus a new suffix md5sum
+   Example:
+     md5sum libwbxml-$MAJOR.$MINOR.$PATCH.tar.* > libwbxml-$MAJOR.$MINOR.$PATCH.md5sum
+     md5sum -c libwbxml-$MAJOR.$MINOR.$PATCH.md5sum
+     sha512sum libwbxml-$MAJOR.$MINOR.$PATCH.tar.* > libwbxml-$MAJOR.$MINOR.$PATCH.sha512sum
+     sha512sum -c libwbxml-$MAJOR.$MINOR.$PATCH.sha512sum
+
+ - upload the tarballs and the checksum file to the File Release System
+   of SourceForge via the web interface
+
