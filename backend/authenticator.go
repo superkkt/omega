@@ -25,8 +25,12 @@ type Authenticator interface {
 }
 
 type Credential interface {
+	// IsAuthorized returns true only if this credential is correct.
 	IsAuthorized() bool
+	// UserID returns user's name.
 	UserID() string
+	// UserUID returns user's unique identifier.
 	UserUID() uint64
+	// TODO: Do we need this function?
 	Password() string
 }
