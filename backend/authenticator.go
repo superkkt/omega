@@ -31,6 +31,4 @@ type Credential interface {
 	UserID() string
 	// UserUID returns user's unique identifier.
 	UserUID() uint64
-	// TODO: Do we need this function?
-	Password() string
 }

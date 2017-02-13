@@ -101,10 +101,6 @@ func (r unauthorized) UserUID() uint64 {
 	return 0
 }
 
-func (r unauthorized) Password() string {
-	return ""
-}
-
 func (r *Listener) dispatcher(w http.ResponseWriter, req *http.Request) {
 	logger.Debug(fmt.Sprintf("Total number of goroutines = %v", runtime.NumGoroutine()))
 	logger.Debug(fmt.Sprintf("Client: %v, Method: %v, URL: %v, Header: %v", req.RemoteAddr, req.Method, req.URL, removeAuthInfo(req.Header)))
@@ -116,7 +112,7 @@ func (r *Listener) dispatcher(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if c.IsAuthorized() == false {
-		logger.Info(fmt.Sprintf("Unauthorized: username=%v, password=%v", c.UserID(), c.Password()))
+		logger.Info(fmt.Sprintf("Unauthorized: username=%v", c.UserID()))
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

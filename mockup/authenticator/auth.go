@@ -10,17 +10,16 @@ type MockAuth struct {
 
 func (r *MockAuth) Auth(userID, password string) (backend.Credential, error) {
 	if userID == r.Username && password == r.Password {
-		return &mockCredential{auth: true, userUID: 1, userID: userID, password: password}, nil
+		return &mockCredential{auth: true, userUID: 1, userID: userID}, nil
 	}
 
-	return &mockCredential{userID: userID, password: password}, nil
+	return &mockCredential{userID: userID}, nil
 }
 
 type mockCredential struct {
-	auth     bool
-	userUID  uint64
-	userID   string
-	password string
+	auth    bool
+	userUID uint64
+	userID  string
 }
 
 func (r *mockCredential) IsAuthorized() bool {
@@ -33,8 +32,4 @@ func (r *mockCredential) UserID() string {
 
 func (r *mockCredential) UserUID() uint64 {
 	return r.userUID
-}
-
-func (r *mockCredential) Password() string {
-	return r.password
 }
