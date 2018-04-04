@@ -5,7 +5,7 @@ Omega is an advanced email service that supports Microsoft Exchange ActiveSync (
 Omega needs the libwbxml library that is customized for Omega. Install it from vendor/github.com/libwbxml/libwbxml directory. Please see INSTALL file in that directory.
 
 # License
-Copyright (C) 2016, 2017 Muzi Katoshi <muzikatoshi@gmail.com>
+Copyright (C) 2016, 2017 Kitae Kim <superkkt@gmail.com>
  
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
