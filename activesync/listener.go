@@ -1,7 +1,7 @@
 /*
  * Omega is an advanced email service that supports Microsoft ActiveSync.
  *
- * Copyright (C) 2016, 2017 Muzi Katoshi <muzikatoshi@gmail.com>
+ * Copyright (C) 2016, 2017 Kitae Kim <superkkt@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package activesync
 
 import (
@@ -26,7 +25,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/Muzikatoshi/omega/backend"
+	"github.com/superkkt/omega/backend"
 
 	"github.com/superkkt/logger"
 	"golang.org/x/net/context"

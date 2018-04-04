@@ -1,7 +1,7 @@
 /*
  * Omega is an advanced email service that supports Microsoft ActiveSync.
  *
- * Copyright (C) 2016, 2017 Muzi Katoshi <muzikatoshi@gmail.com>
+ * Copyright (C) 2016, 2017 Kitae Kim <superkkt@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ package eas25
 import (
 	"encoding/xml"
 
-	"github.com/Muzikatoshi/omega/database"
+	"github.com/superkkt/omega/database"
 )
 
 func (r *handler) handleGetHierarchy(tx database.Transaction) error {

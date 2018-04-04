@@ -1,7 +1,7 @@
 /*
  * Omega is an advanced email service that supports Microsoft ActiveSync.
  *
- * Copyright (C) 2016, 2017 Muzi Katoshi <muzikatoshi@gmail.com>
+ * Copyright (C) 2016, 2017 Kitae Kim <superkkt@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Muzikatoshi/omega/backend"
-	"github.com/Muzikatoshi/omega/database"
+	"github.com/superkkt/omega/backend"
+	"github.com/superkkt/omega/database"
 
 	"github.com/superkkt/logger"
 )
